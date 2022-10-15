@@ -19,6 +19,6 @@ void main() async{
    var port = int.tryParse(Platform.environment['PORT'] ?? '8080')??8080;
   var cascade =
       Cascade().add((request) => UserHandle().handler(request)).handler;
-  final server = await shelf_io.serve(cascade, 'localhost', port);
+  final server = await shelf_io.serve(cascade, '0.0.0.0', port);
   print('Serving at http://${server.address.host}:${server.port}');
 }
