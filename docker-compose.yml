@@ -7,8 +7,8 @@ services:
     restart: always
     environment:
       MYSQL_DATABASE: 'dart'   
-      MYSQL_USER: 'dart_user'
-      MYSQL_PASSWORD: 'dart_pass'      
+      MYSQL_USER: 'root'
+      MYSQL_PASSWORD: 'root'      
       MYSQL_ROOT_PASSWORD: 'root'
     ports:
       - '3306:3306'
