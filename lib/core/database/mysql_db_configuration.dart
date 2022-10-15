@@ -19,8 +19,8 @@ class MySqlDBConfiguration implements DbConfiguration{
     return await MySqlConnection.connect(
      ConnectionSettings(
       host: 'localhost',port: 3306,
-      user: 'dart_user',
-      password: 'dart_pass',
+      user: 'root',
+      password: 'root',
       db: 'dart'
     )
   );
