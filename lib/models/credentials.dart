@@ -1,5 +1,5 @@
 class Credentials {
-  int? cnpj;
+  String? cnpj;
   String? password;
 
   Credentials({this.cnpj, this.password});

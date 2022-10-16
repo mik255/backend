@@ -17,7 +17,7 @@ class UserHandle {
 
       final Credentials credentials = Credentials.fromJson(data);
 
-      return userController.login(credentials).response;
+      return (await userController.login(credentials)).response;
     });
     return router;
   }
