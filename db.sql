@@ -13,6 +13,28 @@ CREATE TABLE IF NOT EXISTS `dart`.`users` (
   PRIMARY KEY (`id`));
 ENGINE = InnoDB;
 
+CREATE TABLE IF NOT EXISTS `dart`.`categories` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(255) NOT NULL,
+  `isBlocked` TINYINT NULL DEFAULT 0,
+  `dt_criacao` datetime DEFAULT CURRENT_TIMESTAMP,
+  `dt_autalizacao` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`));
+ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `dart`.`stories` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `category_id` TINYINT NULL DEFAULT 0,
+  `name` VARCHAR(255) NOT NULL,
+  `pix` VARCHAR(255) NOT NULL,
+  `paymentType` VARCHAR(255) NOT NULL,
+  `isBlocked` TINYINT NULL DEFAULT 0,
+  `totalPrice` NUMERIC NULL DEFAULT 0,
+  `dt_criacao` datetime DEFAULT CURRENT_TIMESTAMP,
+  `dt_autalizacao` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`));
+ENGINE = InnoDB;
+
   CREATE TABLE IF NOT EXISTS `dart`.`products` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(255) NOT NULL,
