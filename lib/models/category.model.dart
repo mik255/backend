@@ -4,13 +4,13 @@ import 'dart:convert';
 import 'story.model.dart';
 
 class Category {
-  int id;
+  int? id;
   String name;
   bool isBlocked;
   List<Story> stories = [];
 
   Category({
-    required this.id,
+    this.id,
     required this.name,
     required this.isBlocked,
     required this.stories,
@@ -27,7 +27,7 @@ class Category {
 
   factory Category.fromMap(Map<String, dynamic> map) {
     return Category(
-      id: map['id'] as int,
+      id: map['id'] as int?,
       name: map['name'] as String,
       isBlocked: map['isBlocked'] == 1,
       stories: map['stories'] == null

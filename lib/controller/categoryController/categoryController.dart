@@ -125,4 +125,68 @@ class CategoryController {
       ));
     }
   }
+
+  Future<CategoryState> setCategory(Category category) async {
+    var conexao = await _di.get<DbConfiguration>().connection;
+    try {
+      Results categoryResult = await conexao.query(
+          "insert into categories (name,isBlocked) values (?,?)",
+          [category.name, category.isBlocked]);
+      return getAll();
+    } catch (e) {
+      String responseBody = jsonEncode({
+        'error': e.toString(),
+      });
+      return CategoryStateError(
+          response: Response(
+        500,
+        body: responseBody,
+        headers: Header.header,
+      ));
+    }
+  }
+
+  Future<CategoryState> updateCategory(
+    Map<String, dynamic> data,
+  ) async {
+    var conexao = await _di.get<DbConfiguration>().connection;
+    try {
+      Results categoryResult = await conexao.query(
+          'Update categories set name =? , isBlocked =?  where id =?',
+          [data['name'], data['isBlocked'], data['id']]);
+
+      return getAll();
+    } catch (e) {
+      String responseBody = jsonEncode({
+        'error': e.toString(),
+      });
+      return CategoryStateError(
+          response: Response(
+        500,
+        body: responseBody,
+        headers: Header.header,
+      ));
+    }
+  }
+   Future<CategoryState> deletCategory(
+    int id,
+  ) async {
+    var conexao = await _di.get<DbConfiguration>().connection;
+    try {
+      Results categoryResult = await conexao.query(
+          'Delete from categories where id=?', [id]);
+
+      return getAll();
+    } catch (e) {
+      String responseBody = jsonEncode({
+        'error': e.toString(),
+      });
+      return CategoryStateError(
+          response: Response(
+        500,
+        body: responseBody,
+        headers: Header.header,
+      ));
+    }
+  }
 }
