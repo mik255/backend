@@ -1,4 +1,3 @@
-
 CREATE SCHEMA IF NOT EXISTS `dart` DEFAULT CHARACTER SET utf8;
 USE `dart`;
 
@@ -10,7 +9,7 @@ CREATE TABLE IF NOT EXISTS `dart`.`users` (
   `is_ativo` TINYINT NULL DEFAULT 1,
   `dt_criacao` datetime DEFAULT CURRENT_TIMESTAMP,
   `dt_autalizacao` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`));
+  PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS `dart`.`categories` (
@@ -19,7 +18,7 @@ CREATE TABLE IF NOT EXISTS `dart`.`categories` (
   `isBlocked` TINYINT NULL DEFAULT 0,
   `dt_criacao` datetime DEFAULT CURRENT_TIMESTAMP,
   `dt_autalizacao` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`));
+  PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS `dart`.`stories` (
@@ -32,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `dart`.`stories` (
   `totalPrice` NUMERIC NULL DEFAULT 0,
   `dt_criacao` datetime DEFAULT CURRENT_TIMESTAMP,
   `dt_autalizacao` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`));
+  PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 
   CREATE TABLE IF NOT EXISTS `dart`.`products` (
@@ -46,6 +45,6 @@ ENGINE = InnoDB;
   `isBlocked` BOOLEAN DEFAULT FALSE,
   `dt_criacao` datetime DEFAULT CURRENT_TIMESTAMP,
   `dt_autalizacao` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`));
+  PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 
