@@ -128,6 +128,7 @@ class CategoryController {
 
   Future<CategoryState> setCategory(Category category) async {
     var conexao = await _di.get<DbConfiguration>().connection;
+  
     try {
       Results categoryResult = await conexao.query(
           "insert into categories (name,isBlocked) values (?,?)",

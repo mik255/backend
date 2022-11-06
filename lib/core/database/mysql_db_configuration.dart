@@ -14,11 +14,14 @@ class MySqlDBConfiguration implements DbConfiguration {
 
   @override
   Future<MySqlConnection> createConnection() async {
-    return await MySqlConnection.connect(ConnectionSettings(
+    var result = await MySqlConnection.connect(ConnectionSettings(
         host: 'localhost',
         port: 3306,
         user: 'root',
         password: 'root',
         db: 'dart'));
+        await Future.delayed(Duration(seconds: 1));
+        return result;
   }
+  
 }
