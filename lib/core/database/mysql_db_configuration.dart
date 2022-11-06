@@ -15,7 +15,7 @@ class MySqlDBConfiguration implements DbConfiguration {
   @override
   Future<MySqlConnection> createConnection() async {
     return await MySqlConnection.connect(ConnectionSettings(
-        host: '0.0.0.0',
+        host: 'localhost',
         port: 3306,
         user: 'root',
         password: 'root',
