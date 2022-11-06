@@ -10,6 +10,6 @@ void main() async {
       .add((request) => UserHandle().handler(request))
       .add((request) => CategoryHandle().handler(request))
       .handler;
-  final server = await shelf_io.serve(cascade, 'localhost', port);
+  final server = await shelf_io.serve(cascade, '0.0.0.0', port);
   print('Serving at http://${server.address.host}:${server.port}');
 }
