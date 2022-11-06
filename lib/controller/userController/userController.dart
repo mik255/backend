@@ -28,11 +28,11 @@ class UserController {
 
   Future<LoginState> login(Credentials credentials) async {
     var conexao = await _di.get<DbConfiguration>().connection;
-    String cnpj = credentials.cnpj!;
+    int cnpj = credentials.cnpj!;
     String password = credentials.password!;
     Results result = await conexao.query(
-        "SELECT * FROM users WHERE cnpj='$cnpj' AND password='$password'");
-
+        "SELECT * FROM users WHERE cnpj='${cnpj.toString()}' AND password='$password'");
+      print(result.first.fields);
     if (result.isEmpty) {
       String responseBody = jsonEncode({
         'error': 'senha/email incorretas ou usuário não existe',
@@ -57,7 +57,7 @@ class UserController {
       print(_);
       return LoginError(
           response: Response(
-        404,
+        200,
         body: e.toString(),
       ));
     }

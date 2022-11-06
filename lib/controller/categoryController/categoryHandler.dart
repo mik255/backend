@@ -19,14 +19,14 @@ class CategoryHandle {
     router.get('/category/all', (Request request) async {
       return (await categoryController.getAll()).response;
     });
-    router.post('/category', (Request request) async {
+    router.post('/category/create', (Request request) async {
       String requestData = await request.readAsString();
 
       final Category category = Category.fromJson(requestData);
 
       return (await categoryController.setCategory(category)).response;
     });
-    router.put('/category', (Request request) async {
+    router.put('/category/update', (Request request) async {
       String requestData = await request.readAsString();
 
       final data = json.decode(requestData) as Map<String, dynamic>;
@@ -34,7 +34,7 @@ class CategoryHandle {
       return (await categoryController.updateCategory(data)).response;
     });
 
-    router.delete('/category', (Request request) async {
+    router.delete('/category/delete', (Request request) async {
       String requestData = await request.readAsString();
 
       final data = json.decode(requestData) as Map<String, dynamic>;
