@@ -5,31 +5,28 @@ import 'dart:convert';
 import 'products.dart';
 
 class Story {
-  String id;
+  int id;
   String name;
   List<Product> productList;
   String pix;
   String? paymentType;
   double totalPrice;
 
-  Story({
-    required this.id,
-    required this.name,
-    required this.productList,
-    required this.totalPrice,
-    required this.pix,
-    this.paymentType
-  });
+  Story(
+      {required this.id,
+      required this.name,
+      required this.productList,
+      required this.totalPrice,
+      required this.pix,
+      this.paymentType});
 
-
-  double getTotal(){
-    double total =0;
-     for (var e in productList) {
-      total+=(e.price*e.count);
+  double getTotal() {
+    double total = 0;
+    for (var e in productList) {
+      total += (e.price * e.count);
     }
     return total;
   }
-
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -44,16 +41,24 @@ class Story {
 
   factory Story.fromMap(Map<String, dynamic> map) {
     return Story(
-      id: map['id'] as String,
+      id: map['id'] as int,
       name: map['name'] as String,
-      productList: List<Product>.from((map['productList'] as List<int>).map<Product>((x) => Product.fromMap(x as Map<String,dynamic>),),),
+      productList: map['productList'] == null
+          ? []
+          : List<Product>.from(
+              (map['productList'] as List<int>).map<Product>(
+                (x) => Product.fromMap(x as Map<String, dynamic>),
+              ),
+            ),
       pix: map['pix'] as String,
-      paymentType: map['paymentType'] != null ? map['paymentType'] as String : null,
+      paymentType:
+          map['paymentType'] != null ? map['paymentType'] as String : null,
       totalPrice: map['totalPrice'] as double,
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory Story.fromJson(String source) => Story.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Story.fromJson(String source) =>
+      Story.fromMap(json.decode(source) as Map<String, dynamic>);
 }

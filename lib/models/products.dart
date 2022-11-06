@@ -2,7 +2,7 @@
 import 'dart:convert';
 
 class Product {
-  String id;
+  int id;
   String name;
   double price;
   int count;
@@ -11,17 +11,16 @@ class Product {
   String urlImg;
   bool isBlocked;
   bool isSelected;
-  Product({
-    required this.id,
-    required this.name,
-    required this.price,
-    required this.squerePrice,
-    required this.urlImg,
-    this.stock,
-    this.count = 0,
-    required this.isBlocked,
-    this.isSelected = false
-  });
+  Product(
+      {required this.id,
+      required this.name,
+      required this.price,
+      required this.squerePrice,
+      required this.urlImg,
+      this.stock,
+      this.count = 0,
+      required this.isBlocked,
+      this.isSelected = false});
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -39,19 +38,19 @@ class Product {
 
   factory Product.fromMap(Map<String, dynamic> map) {
     return Product(
-      id: map['id'] as String,
+      id: map['id'] as int,
       name: map['name'] as String,
       price: map['price'] as double,
       count: map['count'] as int,
       stock: map['stock'] != null ? map['stock'] as int : null,
       squerePrice: map['squerePrice'] as double,
       urlImg: map['urlImg'] as String,
-      isBlocked: map['isBlocked'] as bool,
-      isSelected: map['isSelected'] as bool,
+      isBlocked: map['isBlocked'] == 1,
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory Product.fromJson(String source) => Product.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Product.fromJson(String source) =>
+      Product.fromMap(json.decode(source) as Map<String, dynamic>);
 }

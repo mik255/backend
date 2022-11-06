@@ -4,10 +4,10 @@ import 'dart:convert';
 import 'story.model.dart';
 
 class Category {
-  String id;
+  int id;
   String name;
   bool isBlocked;
-  List<Story> stories;
+  List<Story> stories = [];
 
   Category({
     required this.id,
@@ -15,7 +15,6 @@ class Category {
     required this.isBlocked,
     required this.stories,
   });
-
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -28,14 +27,21 @@ class Category {
 
   factory Category.fromMap(Map<String, dynamic> map) {
     return Category(
-      id: map['id'] as String,
+      id: map['id'] as int,
       name: map['name'] as String,
-      isBlocked: map['isBlocked'] as bool,
-      stories: List<Story>.from((map['stories'] as List<int>).map<Story>((x) => Story.fromMap(x as Map<String,dynamic>),),),
+      isBlocked: map['isBlocked'] == 1,
+      stories: map['stories'] == null
+          ? []
+          : List<Story>.from(
+              (map['stories'] as List<int>).map<Story>(
+                (x) => Story.fromMap(x as Map<String, dynamic>),
+              ),
+            ),
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory Category.fromJson(String source) => Category.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory Category.fromJson(String source) =>
+      Category.fromMap(json.decode(source) as Map<String, dynamic>);
 }
