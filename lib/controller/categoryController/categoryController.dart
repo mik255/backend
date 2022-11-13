@@ -10,6 +10,8 @@ import 'package:backend/models/story.model.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:shelf/shelf.dart';
 
+import '../storyController/storyController.dart';
+
 class CategoryState {
   CategoryState({required this.response});
   Response response;
@@ -80,33 +82,21 @@ class CategoryController {
 
     Results categoryResult = await conexao.query("SELECT * FROM categories");
 
-    if (categoryResult.isEmpty) {
-      String responseBody = jsonEncode({
-        'error': 'categoria esta vazia',
-      });
-      return CategoryStateError(
-          response: Response(
-        200,
-        body: responseBody,
-        headers: Header.header,
-      ));
-    }
     try {
       List<Category> categories = [];
       for (var result in categoryResult) {
         Category category = Category.fromMap(result.fields);
+
         Results storiesResult = await conexao
             .query("SELECT * FROM stories WHERE category_id=${category.id}");
 
-        for (var element in storiesResult) {
-          category.stories.add(Story.fromMap(element.fields));
-        }
-
-        for (var element in category.stories) {
+        for (var storyData in storiesResult) {
+          Story story = Story.fromMap(storyData.fields);
           Results productsResult = await conexao
-              .query("SELECT * FROM products WHERE story_id=${element.id}");
-          element.productList =
+              .query("SELECT * FROM products WHERE store_id=${story.id}");
+          story.productList =
               productsResult.map((e) => Product.fromMap(e.fields)).toList();
+          category.stories.add(story);
         }
         categories.add(category);
       }
@@ -128,7 +118,7 @@ class CategoryController {
 
   Future<CategoryState> setCategory(Category category) async {
     var conexao = await _di.get<DbConfiguration>().connection;
-  
+
     try {
       Results categoryResult = await conexao.query(
           "insert into categories (name,isBlocked) values (?,?)",
@@ -169,13 +159,14 @@ class CategoryController {
       ));
     }
   }
-   Future<CategoryState> deletCategory(
+
+  Future<CategoryState> deletCategory(
     int id,
   ) async {
     var conexao = await _di.get<DbConfiguration>().connection;
     try {
-      Results categoryResult = await conexao.query(
-          'Delete from categories where id=?', [id]);
+      Results categoryResult =
+          await conexao.query('Delete from categories where id=?', [id]);
 
       return getAll();
     } catch (e) {

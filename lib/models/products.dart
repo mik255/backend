@@ -2,17 +2,20 @@
 import 'dart:convert';
 
 class Product {
-  int id;
+  int? id;
+  int? store_id;
   String name;
-  double price;
+  num price;
   int count;
   int? stock;
-  double squerePrice;
+  num squerePrice;
   String urlImg;
   bool isBlocked;
   bool isSelected;
   Product(
-      {required this.id,
+      {
+        this.id,
+        this.store_id,
       required this.name,
       required this.price,
       required this.squerePrice,
@@ -25,6 +28,7 @@ class Product {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
+      'store_id':store_id,
       'name': name,
       'price': price,
       'count': count,
@@ -38,12 +42,13 @@ class Product {
 
   factory Product.fromMap(Map<String, dynamic> map) {
     return Product(
-      id: map['id'] as int,
+      id: map['id'] as int?,
+      store_id:map['store_id'] as int?,
       name: map['name'] as String,
-      price: map['price'] as double,
+      price: map['price'] as num,
       count: map['count'] as int,
       stock: map['stock'] != null ? map['stock'] as int : null,
-      squerePrice: map['squerePrice'] as double,
+      squerePrice: map['squerePrice'] as num,
       urlImg: map['urlImg'] as String,
       isBlocked: map['isBlocked'] == 1,
     );
@@ -53,4 +58,5 @@ class Product {
 
   factory Product.fromJson(String source) =>
       Product.fromMap(json.decode(source) as Map<String, dynamic>);
+      
 }

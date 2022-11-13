@@ -5,24 +5,31 @@ import 'dart:convert';
 import 'products.dart';
 
 class Story {
-  int id;
+  int? id;
+  int? category_id;
+  int isBlocked;
   String name;
-  List<Product> productList;
+  List<Product>? productList;
   String pix;
   String? paymentType;
-  double totalPrice;
+  double? totalPrice;
 
   Story(
-      {required this.id,
+      {required this.isBlocked,
+      required this.id,
+      this.category_id,
       required this.name,
-      required this.productList,
-      required this.totalPrice,
+      this.productList,
+      this.totalPrice,
       required this.pix,
       this.paymentType});
 
   double getTotal() {
+    if (productList == null) {
+      return 0;
+    }
     double total = 0;
-    for (var e in productList) {
+    for (var e in productList!) {
       total += (e.price * e.count);
     }
     return total;
@@ -31,17 +38,21 @@ class Story {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
+      'category_id': category_id,
       'name': name,
-      'productList': productList.map((x) => x.toMap()).toList(),
+      'productList': productList?.map((x) => x.toMap()).toList(),
       'pix': pix,
       'paymentType': paymentType,
       'totalPrice': totalPrice,
+      'isBlocked': isBlocked
     };
   }
 
   factory Story.fromMap(Map<String, dynamic> map) {
     return Story(
-      id: map['id'] as int,
+      id: map['id'] as int?,
+      isBlocked: map['isBlocked'] as int,
+      category_id: map['category_id'] as int?,
       name: map['name'] as String,
       productList: map['productList'] == null
           ? []
@@ -53,7 +64,7 @@ class Story {
       pix: map['pix'] as String,
       paymentType:
           map['paymentType'] != null ? map['paymentType'] as String : null,
-      totalPrice: map['totalPrice'] as double,
+      totalPrice: map['totalPrice'] as double?,
     );
   }
 
