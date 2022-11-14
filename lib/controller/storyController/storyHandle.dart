@@ -13,23 +13,23 @@ class StoryHandle {
   Handler get handler {
     Router router = Router();
     StoryController storyController = StoryController();
-    router.get('/story', (Request request) async {
+    router.get('/stories/id', (Request request) async {
       String requestData = await request.readAsString();
       Map<String, dynamic> data = json.decode(requestData);
 
       return (await storyController.getStoryById(data['id'])).response;
     });
-    router.get('/story/all', (Request request) async {
+    router.get('/stories', (Request request) async {
       return (await storyController.getAll()).response;
     });
-    router.post('/story/create', (Request request) async {
+    router.post('/stories', (Request request) async {
       String requestData = await request.readAsString();
 
       final Story story = Story.fromJson(requestData);
 
       return (await storyController.setStory(story)).response;
     });
-    router.put('/story/update', (Request request) async {
+    router.put('/stories', (Request request) async {
       String requestData = await request.readAsString();
 
       final data = json.decode(requestData) as Map<String, dynamic>;
@@ -37,7 +37,7 @@ class StoryHandle {
       return (await storyController.updateStory(data)).response;
     });
 
-    router.delete('/story/delete', (Request request) async {
+    router.delete('/stories', (Request request) async {
       String requestData = await request.readAsString();
 
       final data = json.decode(requestData) as Map<String, dynamic>;

@@ -103,10 +103,12 @@ class CategoryController {
       return CategoryStateSucess(
           response: Response(
         200,
-        body: categories.map((e) => e.toJson()).toList().toString(),
+        body: categories.map((e) => json.encode(e.toMap())).toList().toString(),
         headers: Header.header,
       ));
     } catch (e, _) {
+      print('category error [ mika]');
+      print(e);
       print(_);
       return CategoryStateError(
           response: Response(
@@ -118,11 +120,11 @@ class CategoryController {
 
   Future<CategoryState> setCategory(Category category) async {
     var conexao = await _di.get<DbConfiguration>().connection;
-
+    print(category.toJson());
     try {
       Results categoryResult = await conexao.query(
           "insert into categories (name,isBlocked) values (?,?)",
-          [category.name, category.isBlocked]);
+          [category.name, category.isBlocked?1:0]);
       return getAll();
     } catch (e) {
       String responseBody = jsonEncode({
@@ -144,7 +146,7 @@ class CategoryController {
     try {
       Results categoryResult = await conexao.query(
           'Update categories set name =? , isBlocked =?  where id =?',
-          [data['name'], data['isBlocked'], data['id']]);
+          [data['name'], data['isBlocked']?1:0, data['id']]);
 
       return getAll();
     } catch (e) {
