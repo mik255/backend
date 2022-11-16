@@ -92,27 +92,49 @@ class StoryController {
       ));
     }
   }
+Future<StoreState> getLast() async {
+    try {
+        var conexao = await _di.get<DbConfiguration>().connection;
 
+    Results storyResult = await conexao.query("SELECT * FROM stories ORDER BY ID DESC LIMIT 1");
+       Story story = Story.fromMap(storyResult.first.fields);
+
+      return StoryStateSucess(
+          response: Response(
+        200,
+        body: story.toJson().toString(),
+        headers: Header.header,
+      ),data:story );
+    } catch (e, _) {
+      print('stories error [ mika]');
+      print(e);
+      print(_);
+      return StoryStateError(
+          response: Response(
+        404,
+        body: e.toString(),
+      ));
+    }
+  }
   Future<StoreState> setStory(Story story) async {
     var conexao = await _di.get<DbConfiguration>().connection;
 
     try {
       Results setResult = await conexao.query(
-          "insert into stories (name,category_id,pix,paymentType,totalPrice,isBlocked) values (?,?,?,?,?,?)",
+          "insert into stories (name,pix,paymentType,totalPrice,isBlocked) values (?,?,?,?,?)",
           [
             story.name,
-            story.category_id,
             story.pix,
             story.paymentType,
             story.totalPrice,
             story.isBlocked
           ]);
-      return StoryStateSucess(
-          response: Response(
-        201,
-        body: getResultMapString(ResultResponse.created),
-        headers: Header.header,
-      ));
+           StoreState lastStory =  await getLast();
+          Story newStory = lastStory.data;
+          List<dynamic> storiesCategories = getStoryWithProductsMap(newStory.id!,story.products_ids);
+          setProducts(storiesCategories);
+      await setProducts(storiesCategories);
+      return getAll();
     } catch (e) {
       String responseBody = jsonEncode({
         'error': e.toString(),
@@ -134,17 +156,43 @@ class StoryController {
     Story story = storyState.data as Story;
     try {
       Results categoryResult = await conexao.query(
-          'Update stories set name =? , category_id =?, pix =? , paymentType =? ,totalPrice =?, isBlocked =? where id =?',
+          'Update stories set name =?, pix =? , paymentType =? ,totalPrice =?, isBlocked =? where id =?',
           [
             data['name'] ?? story.name,
-            data['category_id'] ?? story.category_id,
             data['pix'] ?? story.pix,
             data['paymentType'] ?? story.paymentType,
             data['totalPrice'] ?? story.totalPrice,
             data['isBlocked'] ?? story.isBlocked,
             data['id']
           ]);
-      return StoryStateSucess(
+       Results storyRemove = await conexao.query('Delete from products_join_stories where story_id=?', [data['id']]);
+       List<dynamic> storiesWithProductsMap = getStoryWithProductsMap(data['id'],data['products_ids']);
+      await setProducts(storiesWithProductsMap);
+      return getAll();
+    } catch (e) {
+      String responseBody = jsonEncode({
+        'error': e.toString(),
+      });
+      return StoryStateError(
+          response: Response(
+        500,
+        body: responseBody,
+        headers: Header.header,
+      ));
+    }
+  }
+
+    Future<StoreState> updateMultCategoryStory(
+    List<dynamic> data,
+  ) async {
+    var conexao = await _di.get<DbConfiguration>().connection;
+    try {
+      List<Results> categoryResult = await conexao.queryMulti(
+          'INSERT INTO story_join_category (story_id,category_id) VALUES(?, ?);',
+          data.map((e) => [e['story_id'],e['category_id']]).toList()
+         );
+         
+        return StoryStateSucess(
           response: Response(
         204,
         body: getResultMapString(ResultResponse.updated),
@@ -161,6 +209,7 @@ class StoryController {
         headers: Header.header,
       ));
     }
+    
   }
 
   Future<StoreState> deletCategory(
@@ -200,6 +249,43 @@ class StoryController {
       return state.data as List<Product>;
     } else {
       return [];
+    }
+  }
+    List<dynamic> getStoryWithProductsMap(int store_id,List<dynamic> products_ids) {
+    return products_ids
+        .map(
+          ( e) => {'product_id': e as int, 'story_id': store_id},
+        )
+        .toList();
+  }
+  Future<StoreState> setProducts(List<dynamic> data) async {
+    try {
+      ProductController productController = ProductController();
+      ProductState state = await productController.updateMultCategoryStory(data);
+      if (state is ProductStateSucess) {
+        return StoryStateSucess(
+            response: Response(
+          200,
+          body: {'sucess': true}.toString(),
+          headers: Header.header,
+        ));
+      }
+      return StoryStateError(
+          response: Response(
+        500,
+        body: await state.response.readAsString(),
+        headers: Header.header,
+      ));
+    } catch (e) {
+      String responseBody = jsonEncode({
+        'error': e.toString(),
+      });
+      return StoryStateError(
+          response: Response(
+        500,
+        body: responseBody,
+        headers: Header.header,
+      ));
     }
   }
 }

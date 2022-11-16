@@ -6,19 +6,18 @@ import 'products.dart';
 
 class Story {
   int? id;
-  int? category_id;
   int isBlocked;
   String name;
   List<Product>? productList;
   String pix;
   String? paymentType;
   double? totalPrice;
-
+  List<int> products_ids;
   Story(
       {required this.isBlocked,
       required this.id,
-      this.category_id,
       required this.name,
+       required this.products_ids,
       this.productList,
       this.totalPrice,
       required this.pix,
@@ -38,13 +37,13 @@ class Story {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
-      'category_id': category_id,
       'name': name,
       'productList': productList?.map((x) => x.toMap()).toList(),
       'pix': pix,
       'paymentType': paymentType,
       'totalPrice': totalPrice,
-      'isBlocked': isBlocked
+      'isBlocked': isBlocked,
+       'products_ids': products_ids
     };
   }
 
@@ -52,12 +51,11 @@ class Story {
     return Story(
       id: map['id'] as int?,
       isBlocked: map['isBlocked'] as int,
-      category_id: map['category_id'] as int?,
       name: map['name'] as String,
       productList: map['productList'] == null
           ? []
           : List<Product>.from(
-              (map['productList'] as List<int>).map<Product>(
+              (map['productList'] as List<dynamic>).map<dynamic>(
                 (x) => Product.fromMap(x as Map<String, dynamic>),
               ),
             ),
@@ -65,6 +63,8 @@ class Story {
       paymentType:
           map['paymentType'] != null ? map['paymentType'] as String : null,
       totalPrice: map['totalPrice'] as double?,
+      products_ids:map['products_ids']==null?[]:(map['products_ids'] as List<dynamic>).map((e) => e as int).toList()
+
     );
   }
 

@@ -3,7 +3,6 @@ import 'dart:convert';
 
 class Product {
   int? id;
-  int? store_id;
   String name;
   num price;
   int count;
@@ -15,7 +14,6 @@ class Product {
   Product(
       {
         this.id,
-        this.store_id,
       required this.name,
       required this.price,
       required this.squerePrice,
@@ -28,7 +26,6 @@ class Product {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
-      'store_id':store_id,
       'name': name,
       'price': price,
       'count': count,
@@ -43,7 +40,6 @@ class Product {
   factory Product.fromMap(Map<String, dynamic> map) {
     return Product(
       id: map['id'] as int?,
-      store_id:map['store_id'] as int?,
       name: map['name'] as String,
       price: map['price'] as num,
       count: map['count'] as int,

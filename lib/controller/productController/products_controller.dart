@@ -67,7 +67,7 @@ class ProductController {
     var conexao = await _di.get<DbConfiguration>().connection;
 
     Results allResult =
-        await conexao.query("SELECT * FROM products where store_id = $id");
+        await conexao.query("select distinct *from products x inner join products_join_stories sc on sc.story_id = ${id} and x.id=sc.product_id;");
 
     try {
       List<Product> products = [];
@@ -135,9 +135,8 @@ class ProductController {
 
     try {
       Results setResult = await conexao.query(
-          "insert into products (store_id,name,price,count,stock,squerePrice,urlImg,isBlocked) values (?,?,?,?,?,?,?,?)",
+          "insert into products (store_id,name,price,count,stock,squerePrice,urlImg,isBlocked) values (?,?,?,?,?,?,?)",
           [
-            product.store_id,
             product.name,
             product.price,
             product.count,
@@ -182,7 +181,6 @@ class ProductController {
             data['stock'] ?? product.stock,
             data['squerePrice'] ?? product.squerePrice,
             data['urlImg'] ?? product.urlImg,
-            data['store_id'] ?? product.store_id,
             data['id']
           ]);
       return ProductStateSucess(
@@ -229,5 +227,34 @@ class ProductController {
         headers: Header.header,
       ));
     }
+  }
+      Future<ProductState> updateMultCategoryStory(
+    List<dynamic> data,
+  ) async {
+    var conexao = await _di.get<DbConfiguration>().connection;
+    try {
+      List<Results> categoryResult = await conexao.queryMulti(
+          'INSERT INTO products_join_stories (product_id,story_id) VALUES(?, ?);',
+          data.map((e) => [e['product_id'],e['story_id']]).toList()
+         );
+         
+        return ProductStateSucess(
+          response: Response(
+        204,
+        body: getResultMapString(ResultResponse.updated),
+        headers: Header.header,
+      ));
+    } catch (e) {
+      String responseBody = jsonEncode({
+        'error': e.toString(),
+      });
+      return ProductStateError(
+          response: Response(
+        500,
+        body: responseBody,
+        headers: Header.header,
+      ));
+    }
+    
   }
 }

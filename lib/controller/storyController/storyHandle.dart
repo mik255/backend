@@ -29,6 +29,7 @@ class StoryHandle {
 
       return (await storyController.setStory(story)).response;
     });
+    
     router.put('/stories', (Request request) async {
       String requestData = await request.readAsString();
 

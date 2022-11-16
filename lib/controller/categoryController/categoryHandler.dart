@@ -26,6 +26,13 @@ class CategoryHandle {
 
       return (await categoryController.setCategory(category)).response;
     });
+    router.post('/category/stories', (Request request) async {
+      String requestData = await request.readAsString();
+
+      List<dynamic> data = json.decode(requestData);
+
+      return (await categoryController.setStories(data)).response;
+    });
     router.put('/category', (Request request) async {
       String requestData = await request.readAsString();
 

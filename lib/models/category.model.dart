@@ -8,12 +8,13 @@ class Category {
   String name;
   bool isBlocked;
   List<Story> stories = [];
-
+  List<int> stories_ids = [];
   Category({
     this.id,
     required this.name,
     required this.isBlocked,
     required this.stories,
+    required this.stories_ids
   });
 
   Map<String, dynamic> toMap() {
@@ -21,7 +22,8 @@ class Category {
       'id': id,
       'name': name,
       'isBlocked': isBlocked,
-      'stories': stories.map((x) => x.toMap()).toList()
+      'stories': stories.map((x) => x.toMap()).toList(),
+      'stories_ids':stories_ids
     };
   }
 
@@ -37,6 +39,7 @@ class Category {
                 (x) => Story.fromMap(x as Map<String, dynamic>),
               ),
             ),
+            stories_ids:map['stories_ids']==null?[]:(map['stories_ids'] as List<dynamic>).map((e) => e as int).toList()
     );
   }
 
