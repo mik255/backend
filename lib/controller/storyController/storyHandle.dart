@@ -32,10 +32,9 @@ class StoryHandle {
     
     router.put('/stories', (Request request) async {
       String requestData = await request.readAsString();
-
       final data = json.decode(requestData) as Map<String, dynamic>;
-
       return (await storyController.updateStory(data)).response;
+
     });
 
     router.delete('/stories', (Request request) async {

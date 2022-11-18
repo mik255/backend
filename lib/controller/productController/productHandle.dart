@@ -17,17 +17,17 @@ class ProductHandle {
 
       return (await productController.getProductById(data['id'])).response;
     });
-    router.get('/product/all', (Request request) async {
+    router.get('/products', (Request request) async {
       return (await productController.getAll()).response;
     });
-    router.post('/product/create', (Request request) async {
+    router.post('/products', (Request request) async {
       String requestData = await request.readAsString();
 
       final Product product = Product.fromJson(requestData);
 
       return (await productController.setProduct(product)).response;
     });
-    router.put('/product/update', (Request request) async {
+    router.put('/products', (Request request) async {
       String requestData = await request.readAsString();
 
       final data = json.decode(requestData) as Map<String, dynamic>;
@@ -35,7 +35,7 @@ class ProductHandle {
       return (await productController.updateProduct(data)).response;
     });
 
-    router.delete('/product/delete', (Request request) async {
+    router.delete('/products', (Request request) async {
       String requestData = await request.readAsString();
 
       final data = json.decode(requestData) as Map<String, dynamic>;

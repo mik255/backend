@@ -8,5 +8,5 @@ sucess,
 }
 
 String getResultMapString(ResultResponse response){
-return {"result":response.name}.toString();
+return '{"sucess":true}';
 }

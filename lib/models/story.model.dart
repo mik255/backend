@@ -50,8 +50,8 @@ class Story {
   factory Story.fromMap(Map<String, dynamic> map) {
     return Story(
       id: map['id'] as int?,
-      isBlocked: map['isBlocked'] as int,
-      name: map['name'] as String,
+      isBlocked: map['isBlocked'] as int? ??0,
+      name: map['name'] as String? ??'',
       productList: map['productList'] == null
           ? []
           : List<Product>.from(
@@ -59,10 +59,10 @@ class Story {
                 (x) => Product.fromMap(x as Map<String, dynamic>),
               ),
             ),
-      pix: map['pix'] as String,
+      pix: map['pix'] as String? ??'',
       paymentType:
           map['paymentType'] != null ? map['paymentType'] as String : null,
-      totalPrice: map['totalPrice'] as double?,
+      totalPrice: double.parse((map['totalPrice']??0).toString()),
       products_ids:map['products_ids']==null?[]:(map['products_ids'] as List<dynamic>).map((e) => e as int).toList()
 
     );

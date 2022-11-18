@@ -63,8 +63,8 @@ class ProductController {
     }
   }
 
-  Future<ProductState> getAllByStoreId(int id) async {
-    var conexao = await _di.get<DbConfiguration>().connection;
+  Future<ProductState> getAllByStoreId(int id,MySqlConnection conexao) async {
+
 
     Results allResult =
         await conexao.query("select distinct *from products x inner join products_join_stories sc on sc.story_id = ${id} and x.id=sc.product_id;");
@@ -135,7 +135,7 @@ class ProductController {
 
     try {
       Results setResult = await conexao.query(
-          "insert into products (store_id,name,price,count,stock,squerePrice,urlImg,isBlocked) values (?,?,?,?,?,?,?)",
+          "insert into products (name,price,count,stock,squerePrice,urlImg,isBlocked) values (?,?,?,?,?,?,?)",
           [
             product.name,
             product.price,
@@ -147,7 +147,7 @@ class ProductController {
           ]);
       return ProductStateSucess(
           response: Response(
-        201,
+        200,
         body: getResultMapString(ResultResponse.created),
         headers: Header.header,
       ));
@@ -229,9 +229,8 @@ class ProductController {
     }
   }
       Future<ProductState> updateMultCategoryStory(
-    List<dynamic> data,
+    List<dynamic> data,MySqlConnection conexao
   ) async {
-    var conexao = await _di.get<DbConfiguration>().connection;
     try {
       List<Results> categoryResult = await conexao.queryMulti(
           'INSERT INTO products_join_stories (product_id,story_id) VALUES(?, ?);',

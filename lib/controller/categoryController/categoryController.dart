@@ -13,13 +13,14 @@ import 'package:shelf/shelf.dart';
 import '../storyController/storyController.dart';
 
 class CategoryState {
-  CategoryState({required this.response,this.data});
+  CategoryState({required this.response, this.data});
   Response response;
   dynamic data;
 }
 
 class CategoryStateSucess extends CategoryState {
-  CategoryStateSucess({required Response response,dynamic data}) : super(response: response,data: data);
+  CategoryStateSucess({required Response response, dynamic data})
+      : super(response: response, data: data);
 }
 
 class CategoryStateError extends CategoryState {
@@ -28,6 +29,26 @@ class CategoryStateError extends CategoryState {
 
 class CategoryController {
   final _di = Injects.initialize();
+
+  Future<List<Story>> getStoriesWithCategoryId(int id,MySqlConnection conexao) async {
+    try {
+      StoryController storyController = StoryController();
+      Results storiesResult = await conexao.query(
+          "select distinct * from stories x inner join story_join_category sc on sc.category_id = ${id} and x.id=sc.story_id;");
+      List<Story> stories = [];
+      for (var result in storiesResult) {
+        Story story = Story.fromMap(result.fields);
+        story.productList =
+            await storyController.getProductsByStoryId(story.id,conexao);
+        stories.add(story);
+      }
+      return stories;
+    } catch (e,_) {
+      print(e);
+      print(_);
+      return [];
+    }
+  }
 
   Future<CategoryState> getCategoryById(int id) async {
     var conexao = await _di.get<DbConfiguration>().connection;
@@ -87,27 +108,21 @@ class CategoryController {
       List<Category> categories = [];
       for (var result in categoryResult) {
         Category category = Category.fromMap(result.fields);
-
-        Results storiesResult = await conexao.query(
-            "select distinct * from stories x inner join story_join_category sc on sc.category_id = ${category.id} and x.id=sc.story_id;");
-
-        for (var storyData in storiesResult) {
-          Story story = Story.fromMap(storyData.fields);
-          Results productsResult = await conexao
-              .query("SELECT * FROM products WHERE store_id=${story.id}");
-          story.productList =
-              productsResult.map((e) => Product.fromMap(e.fields)).toList();
-          category.stories.add(story);
-        }
+        List<Story> stories = await getStoriesWithCategoryId(category.id!,conexao);
+        category.stories = stories;
         categories.add(category);
       }
 
       return CategoryStateSucess(
           response: Response(
-        200,
-        body: categories.map((e) => json.encode(e.toMap())).toList().toString(),
-        headers: Header.header,
-      ),data:categories );
+            200,
+            body: categories
+                .map((e) => json.encode(e.toMap()))
+                .toList()
+                .toString(),
+            headers: Header.header,
+          ),
+          data: categories);
     } catch (e, _) {
       print('category error [ mika]');
       print(e);
@@ -120,21 +135,21 @@ class CategoryController {
     }
   }
 
-Future<CategoryState> getLast() async {
-  
-
+  Future<CategoryState> getLast() async {
     try {
-        var conexao = await _di.get<DbConfiguration>().connection;
+      var conexao = await _di.get<DbConfiguration>().connection;
 
-    Results categoryResult = await conexao.query("SELECT * FROM categories ORDER BY ID DESC LIMIT 1");
-       Category category = Category.fromMap(categoryResult.first.fields);
+      Results categoryResult = await conexao
+          .query("SELECT * FROM categories ORDER BY ID DESC LIMIT 1");
+      Category category = Category.fromMap(categoryResult.first.fields);
 
       return CategoryStateSucess(
           response: Response(
-        200,
-        body: category.toJson().toString(),
-        headers: Header.header,
-      ),data:category );
+            200,
+            body: category.toJson().toString(),
+            headers: Header.header,
+          ),
+          data: category);
     } catch (e, _) {
       print('category error [ mika]');
       print(e);
@@ -146,17 +161,18 @@ Future<CategoryState> getLast() async {
       ));
     }
   }
-
 
   Future<CategoryState> setCategory(Category category) async {
     var conexao = await _di.get<DbConfiguration>().connection;
     print(category.toJson());
     try {
       Results categoryResult = await conexao.query(
-          "insert into categories (name,isBlocked) values (?,?)",[category.name, category.isBlocked ? 1 : 0]);
-          CategoryState lastCategory =  await getLast();
-          Category newCategory = lastCategory.data;
-          List<dynamic> storiesCategories = getStoryWithCategoryMap(newCategory.id!,category.stories_ids);
+          "insert into categories (name,isBlocked) values (?,?)",
+          [category.name, category.isBlocked ? 1 : 0]);
+      CategoryState lastCategory = await getLast();
+      Category newCategory = lastCategory.data;
+      List<dynamic> storiesCategories =
+          getStoryWithCategoryMap(newCategory.id!, category.stories_ids);
       await setStories(storiesCategories);
       return getAll();
     } catch (e) {
@@ -180,9 +196,11 @@ Future<CategoryState> getLast() async {
       Results categoryResult = await conexao.query(
           'Update categories set name =? , isBlocked =?  where id =?',
           [data['name'], data['isBlocked'] ? 1 : 0, data['id']]);
-        
-       Results categoryRemove = await conexao.query('Delete from story_join_category where category_id=?', [data['id']]);
-       List<dynamic> storiesCategories = getStoryWithCategoryMap(data['id'],data['stories_ids']);
+
+      Results categoryRemove = await conexao.query(
+          'Delete from story_join_category where category_id=?', [data['id']]);
+      List<dynamic> storiesCategories =
+          getStoryWithCategoryMap(data['id'], data['stories_ids']);
       await setStories(storiesCategories);
       return getAll();
     } catch (e) {
@@ -251,10 +269,11 @@ Future<CategoryState> getLast() async {
     }
   }
 
-  List<dynamic> getStoryWithCategoryMap(int category_id,List<dynamic> stories_ids) {
+  List<dynamic> getStoryWithCategoryMap(
+      int category_id, List<dynamic> stories_ids) {
     return stories_ids
         .map(
-          ( e) => {'story_id': e as int, 'category_id': category_id},
+          (e) => {'story_id': e as int, 'category_id': category_id},
         )
         .toList();
   }

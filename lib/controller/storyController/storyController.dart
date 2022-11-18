@@ -74,7 +74,7 @@ class StoryController {
       List<Story> stories = [];
       for (var result in allResult) {
         Story story = Story.fromMap(result.fields);
-        story.productList = await _getProductsByStoryId(story.id!);
+        story.productList = await getProductsByStoryId(story.id!,conexao);
         stories.add(story);
       }
       return StoryStateSucess(
@@ -132,8 +132,7 @@ Future<StoreState> getLast() async {
            StoreState lastStory =  await getLast();
           Story newStory = lastStory.data;
           List<dynamic> storiesCategories = getStoryWithProductsMap(newStory.id!,story.products_ids);
-          setProducts(storiesCategories);
-      await setProducts(storiesCategories);
+      await setProducts(storiesCategories,conexao);
       return getAll();
     } catch (e) {
       String responseBody = jsonEncode({
@@ -151,12 +150,13 @@ Future<StoreState> getLast() async {
   Future<StoreState> updateStory(
     Map<String, dynamic> data,
   ) async {
+    print(data);
     var conexao = await _di.get<DbConfiguration>().connection;
     StoreState storyState = await getStoryById(data['id']);
     Story story = storyState.data as Story;
     try {
       Results categoryResult = await conexao.query(
-          'Update stories set name =?, pix =? , paymentType =? ,totalPrice =?, isBlocked =? where id =?',
+          'Update stories set name =?, pix =?, paymentType =?, totalPrice =?, isBlocked =? where id =?',
           [
             data['name'] ?? story.name,
             data['pix'] ?? story.pix,
@@ -166,10 +166,17 @@ Future<StoreState> getLast() async {
             data['id']
           ]);
        Results storyRemove = await conexao.query('Delete from products_join_stories where story_id=?', [data['id']]);
-       List<dynamic> storiesWithProductsMap = getStoryWithProductsMap(data['id'],data['products_ids']);
-      await setProducts(storiesWithProductsMap);
-      return getAll();
-    } catch (e) {
+       List<dynamic> storiesWithProductsMap = getStoryWithProductsMap(data['id'],data['products_ids']??[]);
+      await setProducts(storiesWithProductsMap,conexao);
+       return StoryStateSucess(
+          response: Response(
+        200,
+        body: getResultMapString(ResultResponse.updated),
+        headers: Header.header,
+      ));
+    } catch (e,_) {
+      print(e);
+      print(_);
       String responseBody = jsonEncode({
         'error': e.toString(),
       });
@@ -239,12 +246,12 @@ Future<StoreState> getLast() async {
     }
   }
 
-  Future<List<Product>> _getProductsByStoryId(int? id) async {
+  Future<List<Product>> getProductsByStoryId(int? id,MySqlConnection conexao) async {
     if (id == null) {
       return [];
     }
     ProductController productController = ProductController();
-    ProductState state = await productController.getAllByStoreId(id);
+    ProductState state = await productController.getAllByStoreId(id,conexao);
     if (state is ProductStateSucess) {
       return state.data as List<Product>;
     } else {
@@ -258,10 +265,10 @@ Future<StoreState> getLast() async {
         )
         .toList();
   }
-  Future<StoreState> setProducts(List<dynamic> data) async {
+  Future<StoreState> setProducts(List<dynamic> data,MySqlConnection conexao) async {
     try {
       ProductController productController = ProductController();
-      ProductState state = await productController.updateMultCategoryStory(data);
+      ProductState state = await productController.updateMultCategoryStory(data,conexao);
       if (state is ProductStateSucess) {
         return StoryStateSucess(
             response: Response(
