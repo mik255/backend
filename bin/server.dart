@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:backend/controller/account/accountHandle.dart';
 import 'package:backend/controller/categoryController/categoryHandler.dart';
 import 'package:backend/controller/productController/productHandle.dart';
 import 'package:backend/controller/storyController/storyHandle.dart';
@@ -14,6 +15,7 @@ void main() async {
       .add((request) => CategoryHandle().handler(request))
       .add((request) => ProductHandle().handler(request))
       .add((request) => StoryHandle().handler(request))
+      .add((request) => AccountHandle().handler(request))
       .handler;
 
   final server = await shelf_io.serve(cascade, '0.0.0.0', port);
