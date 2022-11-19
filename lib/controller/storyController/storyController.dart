@@ -219,6 +219,37 @@ Future<StoreState> getLast() async {
     
   }
 
+    Future<StoreState> updateMultReceiptStory(
+    List<dynamic> data,
+  ) async {
+    var conexao = await _di.get<DbConfiguration>().connection;
+    try {
+      List<Results> receiptsResult = await conexao.queryMulti(
+          'INSERT INTO receipts_join_stories (story_id,receipt_id) VALUES(?, ?);',
+          data.map((e) => [e['story_id'],e['receipt_id']]).toList()
+         );
+         
+        return StoryStateSucess(
+          response: Response(
+        200,
+        body: getResultMapString(ResultResponse.updated),
+        headers: Header.header,
+      ));
+    } catch (e) {
+      String responseBody = jsonEncode({
+        'error': e.toString(),
+      });
+      return StoryStateError(
+          response: Response(
+        500,
+        body: responseBody,
+        headers: Header.header,
+      ));
+    }
+    
+  }
+
+
   Future<StoreState> deletCategory(
     int id,
   ) async {
