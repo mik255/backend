@@ -9,15 +9,9 @@ import 'userController.dart';
 class UserHandle {
   Handler get handler {
     Router router = Router();
-    router.post('/login', (Request request) async {
+    router.get('/users', (Request request) async {
       UserController userController = UserController();
-
-      String requestData = await request.readAsString();
-      Map<String, dynamic> data = json.decode(requestData);
-
-      final Credentials credentials = Credentials.fromJson(data);
-
-      return (await userController.login(credentials)).response;
+      return (await userController.getAll()).response;
     });
     return router;
   }

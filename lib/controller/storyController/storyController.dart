@@ -92,6 +92,8 @@ class StoryController {
       ));
     }
   }
+
+
 Future<StoreState> getLast() async {
     try {
         var conexao = await _di.get<DbConfiguration>().connection;
@@ -326,4 +328,31 @@ Future<StoreState> getLast() async {
       ));
     }
   }
+
+   Future<StoreState> setMultStories(List<Story> stories)async{
+  var conexao = await _di.get<DbConfiguration>().connection;
+  ProductController productController = ProductController();
+    try {
+      await Future.wait(stories.map((e) => Future.wait(e.productList!.map((e) async=> 
+      await productController.setProduct(e)))));
+      await Future.wait(stories.map((e) => setStory(e)));
+         
+        return StoryStateSucess(
+          response: Response(
+        200,
+        body: getResultMapString(ResultResponse.updated),
+        headers: Header.header,
+      ));
+    } catch (e) {
+      String responseBody = jsonEncode({
+        'error': e.toString(),
+      });
+      return StoryStateError(
+          response: Response(
+        500,
+        body: responseBody,
+        headers: Header.header,
+      ));
+    }
+   }
 }

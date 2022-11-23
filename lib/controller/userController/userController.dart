@@ -10,56 +10,49 @@ import 'package:shelf/shelf.dart';
 
 import '../../models/credentials.dart';
 
-class LoginState {
-  LoginState({required this.response});
+class UserState {
+  UserState({required this.response});
   Response response;
 }
 
-class LoginSucess extends LoginState {
-  LoginSucess({required Response response}) : super(response: response);
+class UserSucess extends UserState {
+  UserSucess({required Response response}) : super(response: response);
 }
 
-class LoginError extends LoginState {
-  LoginError({required Response response}) : super(response: response);
+class UserError extends UserState {
+  UserError({required Response response}) : super(response: response);
 }
 
 class UserController {
   final _di = Injects.initialize();
 
-  Future<LoginState> login(Credentials credentials) async {
+  
+ Future<UserState> getAll() async {
     var conexao = await _di.get<DbConfiguration>().connection;
-    int cnpj = credentials.cnpj!;
-    String password = credentials.password!;
-    Results result = await conexao.query(
-        "SELECT * FROM users WHERE cnpj='${cnpj.toString()}' AND password='$password'");
-      print(result.first.fields);
-    if (result.isEmpty) {
-      String responseBody = jsonEncode({
-        'error': 'senha/email incorretas ou usuário não existe',
-      });
-      return LoginError(
-          response: Response(
-        404,
-        body: responseBody,
-        headers: Header.header,
-      ));
-    }
-    try {
-      User user = User.fromMap(result.first.fields);
 
-      return LoginSucess(
+    Results allResult = await conexao.query("SELECT * FROM users");
+
+    try {
+      List<User> users = [];
+      for (var result in allResult) {
+        User user = User.fromMap(result.fields);
+        users.add(user);
+      }
+      return UserSucess(
           response: Response(
         200,
-        body: user.toJson().toString(),
+        body: users.map((e) => e.toJson()).toList().toString(),
         headers: Header.header,
       ));
     } catch (e, _) {
       print(_);
-      return LoginError(
+      return UserError(
           response: Response(
-        200,
+        404,
         body: e.toString(),
       ));
     }
   }
+
+
 }

@@ -39,7 +39,7 @@ class ReceiptController {
       receiptResult =
           await conexao.query("SELECT * FROM receipts WHERE id=$id");
           Receipt receipt = Receipt.fromMap(receiptResult.last.fields);
-          receipt.stories = await getStoriesWithReceiptId(id,conexao);
+          receipt.attributes.stories = await getStoriesWithReceiptId(id,conexao);
       return ReceiptStateSucess(
           response: Response(
             200,
@@ -67,6 +67,7 @@ class ReceiptController {
       headers: Header.header,
     ));
   }
+
 
   Future<ReceiptState> getAll() async {
     var conexao = await _di.get<DbConfiguration>().connection;
@@ -99,6 +100,38 @@ class ReceiptController {
     }
   }
 
+Future<ReceiptState> getAllByUserId(int id) async {
+    var conexao = await _di.get<DbConfiguration>().connection;
+
+    Results receiptsResult = await conexao.query("SELECT * FROM receipts where user_id = $id");
+
+    try {
+      List<Receipt> receipts = [];
+      for (var result in receiptsResult) {
+        Receipt receipt = Receipt.fromMap(result.fields);
+        receipts.add(receipt);
+      }
+      return ReceiptStateSucess(
+          response: Response(
+            200,
+            body:
+                receipts.map((e) => json.encode(e.toMap())).toList().toString(),
+            headers: Header.header,
+          ),
+          data: receipts);
+    } catch (e, _) {
+      print('receipts error [ mika]');
+      print(e);
+      print(_);
+      return ReceiptStateError(
+          response: Response(
+        404,
+        body: e.toString(),
+      ));
+    }
+  }
+
+
   Future<ReceiptState> getLast() async {
     try {
       var conexao = await _di.get<DbConfiguration>().connection;
@@ -128,17 +161,20 @@ class ReceiptController {
 
   Future<ReceiptState> setReceipt(Receipt receipt) async {
     var conexao = await _di.get<DbConfiguration>().connection;
-    print(receipt.toJson());
+    Map<String,dynamic> stories = {};
+    stories['stories'] = receipt.attributes.stories.map((e) => e.toJson()).toList();
+    print(json.encode(stories));
     try {
       Results categoryResult = await conexao.query(
-          "insert into receipts (observation,paymentType,category_id,totalPrice) values (?,?,?,?)",
-          [receipt.observation,receipt.paymentType, receipt.category_id, receipt.totalPrice]);
+          "insert into receipts (observation,paymentType,category_id,user_id,totalPrice,attributes) values (?,?,?,?,?,?)",
+          [receipt.observation,
+          receipt.paymentType,
+           receipt.category_id,
+           receipt.user_id,
+            receipt.totalPrice,
+            json.encode(stories),
+            ]);
 
-      ReceiptState lastReceipt = await getLast();
-      Receipt newReceipt = lastReceipt.data;
-      List<dynamic> receiptWithStories =
-          getStoryWithReceiptMap(newReceipt.id!, receipt.stories_ids!);
-      await setStories(receiptWithStories);
       return ReceiptStateSucess(
           response: Response(
             200,
@@ -146,7 +182,10 @@ class ReceiptController {
             headers: Header.header,
           ),
           data: receipt);
-    } catch (e) {
+    } catch (e,_) {
+           print('receipts error [ mika]');
+      print(e);
+      print(_);
       String responseBody = jsonEncode({
         'error': e.toString(),
       });

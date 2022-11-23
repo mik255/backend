@@ -9,7 +9,7 @@ class AccountHandle {
   Handler get handler {
     Router router = Router();
     AccountController controller = AccountController();
-    router.post('/users/login', (Request request) async {
+    router.post('/login', (Request request) async {
       String requestData = await request.readAsString();
       Map<String, dynamic> data = json.decode(requestData);
       User user = User.fromMap(data);
