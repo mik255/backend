@@ -3,10 +3,10 @@ import 'dart:convert';
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 class User {
   int? id;
-  String nome;
-  String cnpj;
-  String password;
-  int isAtivo;
+  String? nome;
+  String? cnpj;
+  String? password;
+  int? isAtivo;
   User({
     this.id,
     required this.nome,
@@ -30,7 +30,7 @@ class User {
     return User(
       id: map['id'] as int?,
       nome: map['nome'] as String? ??'null',
-      cnpj: map['cnpj'] as String,
+      cnpj: map['cnpj'] as String?,
       password: map['password'] as String? ?? 'null',
       isAtivo: map['is_ativo'] as int? ?? 0,
     );

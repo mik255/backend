@@ -68,6 +68,68 @@ class ReceiptController {
     ));
   }
 
+Future<ReceiptState> getUserReceipts(int id) async {
+    var conexao = await _di.get<DbConfiguration>().connection;
+
+    Results receiptsResult = await conexao.query("select * from receipts where user_id =$id");
+
+    try {
+      List<Receipt> receipts = [];
+      for (var result in receiptsResult) {
+        Receipt receipt = Receipt.fromMap(result.fields);
+        receipts.add(receipt);
+      }
+      return ReceiptStateSucess(
+          response: Response(
+            200,
+            body:
+                receipts.map((e) => json.encode(e.toMap())).toList().toString(),
+            headers: Header.header,
+          ),
+          data: receipts);
+    } catch (e, _) {
+      print('receipts error [ mika]');
+      print(e);
+      print(_);
+      return ReceiptStateError(
+          response: Response(
+        404,
+        body: e.toString(),
+      ));
+    }
+  }
+
+Future<ReceiptState> getUserReceiptsByDate(int id,String start,String end) async {
+    var conexao = await _di.get<DbConfiguration>().connection;
+
+    Results receiptsResult = await conexao.query("select * from receipts where user_id =$id and dt_criacao BETWEEN $start and $end");
+
+    try {
+      List<Receipt> receipts = [];
+      for (var result in receiptsResult) {
+        Receipt receipt = Receipt.fromMap(result.fields);
+        receipts.add(receipt);
+      }
+      return ReceiptStateSucess(
+          response: Response(
+            200,
+            body:
+                receipts.map((e) => json.encode(e.toMap())).toList().toString(),
+            headers: Header.header,
+          ),
+          data: receipts);
+    } catch (e, _) {
+      print('receipts error [ mika]');
+      print(e);
+      print(_);
+      return ReceiptStateError(
+          response: Response(
+        404,
+        body: e.toString(),
+      ));
+    }
+  }
+
 
   Future<ReceiptState> getAll() async {
     var conexao = await _di.get<DbConfiguration>().connection;
