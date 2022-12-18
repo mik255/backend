@@ -24,10 +24,10 @@ class ReceiptHandle {
     router.get('/receipts', (Request request) async {
       return (await receiptController.getAll()).response;
     });
-     router.get('/receipts/user', (Request request) async {
+     router.post('/receipts/user', (Request request) async {
       String requestData = await request.readAsString();
       Map<String, dynamic> data = json.decode(requestData);
-      return (await receiptController.getReceiptById(data['id'])).response;
+      return (await receiptController.getUserReceipts(data['id'])).response;
     });
     router.post('/receipts', (Request request) async {
       String requestData = await request.readAsString();

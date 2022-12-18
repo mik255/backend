@@ -29,7 +29,7 @@ class AccountController {
 
     Results results = await conexao.query("select * from users where password = '${useData.password}' and cnpj = ${useData.cnpj};");
    
-    User user = (await getLast()).data;
+    User user = User.fromMap(results.first.fields);
 
     try {
 
