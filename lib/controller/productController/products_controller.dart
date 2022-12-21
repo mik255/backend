@@ -173,7 +173,7 @@ class ProductController {
     try {
       Results categoryResult = await conexao.query(
           'Update products set name =?, '
-          'price =? , count =? , stock =? , squerePrice =? ,urlImg =?, store_id=? where id =?',
+          'price =? , count =? , stock =? , squerePrice =? ,urlImg =?,isBlocked=? where id =?',
           [
             data['name'] ?? product.name,
             data['price'] ?? product.price,
@@ -181,6 +181,7 @@ class ProductController {
             data['stock'] ?? product.stock,
             data['squerePrice'] ?? product.squerePrice,
             data['urlImg'] ?? product.urlImg,
+            data['isBlocked']?? product.isBlocked,
             data['id']
           ]);
       return ProductStateSucess(

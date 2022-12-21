@@ -31,7 +31,7 @@ class Story {
     for (var e in productList!) {
       total += (e.price * e.count);
     }
-    return total;
+    return totalPrice = total;
   }
 
   Map<String, dynamic> toMap() {

@@ -74,7 +74,9 @@ class StoryController {
       List<Story> stories = [];
       for (var result in allResult) {
         Story story = Story.fromMap(result.fields);
+        
         story.productList = await getProductsByStoryId(story.id!,conexao);
+        
         stories.add(story);
       }
       return StoryStateSucess(
@@ -190,7 +192,39 @@ Future<StoreState> getLast() async {
       ));
     }
   }
+  Future<StoreState> updateTotalStory(
+    int id,double total, MySqlConnection conexao
+  ) async {
+  
 
+    try {
+      Results categoryResult = await conexao.query(
+          'Update stories set totalPrice =? where id =?',
+          [
+            total,
+            id
+          ]);
+      
+       return StoryStateSucess(
+          response: Response(
+        200,
+        body: getResultMapString(ResultResponse.updated),
+        headers: Header.header,
+      ));
+    } catch (e,_) {
+      print(e);
+      print(_);
+      String responseBody = jsonEncode({
+        'error': e.toString(),
+      });
+      return StoryStateError(
+          response: Response(
+        500,
+        body: responseBody,
+        headers: Header.header,
+      ));
+    }
+  }
     Future<StoreState> updateMultCategoryStory(
     List<dynamic> data,
   ) async {

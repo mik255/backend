@@ -79,6 +79,7 @@ Future<ReceiptState> getUserReceipts(int id) async {
         Receipt receipt = Receipt.fromMap(result.fields);
         receipts.add(receipt);
       }
+     
       return ReceiptStateSucess(
           response: Response(
             200,
@@ -225,6 +226,7 @@ Future<ReceiptState> getAllByUserId(int id) async {
     var conexao = await _di.get<DbConfiguration>().connection;
     Map<String,dynamic> stories = {};
     stories['stories'] = receipt.attributes.stories.map((e) => e.toJson()).toList();
+    StoryController storyController = StoryController();
     print(json.encode(stories));
     try {
       Results categoryResult = await conexao.query(
@@ -236,7 +238,9 @@ Future<ReceiptState> getAllByUserId(int id) async {
             receipt.totalPrice,
             json.encode(stories),
             ]);
-
+          receipt.attributes.stories.forEach((e)async{
+            await storyController.updateTotalStory(e.id!,(e.totalPrice??0)+e.getTotal(),conexao);
+          });
       return ReceiptStateSucess(
           response: Response(
             200,
