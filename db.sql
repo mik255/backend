@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `dart`.`stories` (
   `category_id` TINYINT NULL DEFAULT 0,
   `name` VARCHAR(255) NOT NULL,
   `pix` VARCHAR(255) NOT NULL,
-  `paymentType` VARCHAR(255) NOT NULL,
+  `paymentType` VARCHAR(255) NULL,
   `isBlocked` TINYINT NULL DEFAULT 0,
   `totalPrice` NUMERIC NULL DEFAULT 0,
   `dt_criacao` datetime DEFAULT CURRENT_TIMESTAMP,
@@ -48,3 +48,38 @@ ENGINE = InnoDB;
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 
+ CREATE TABLE IF NOT EXISTS `dart`.`story_join_category` (
+  story_id int NOT NULL,
+  category_id int NOT NULL,
+  foreign KEY (story_id) references stories(id) ON DELETE CASCADE,
+  foreign KEY (category_id) references categories(id) ON DELETE CASCADE)
+ENGINE = InnoDB;
+
+ CREATE TABLE IF NOT EXISTS `dart`.`products_join_stories` (
+  product_id int NOT NULL,
+  story_id int NOT NULL,
+  foreign KEY (story_id) references stories(id) ON DELETE CASCADE,
+  foreign KEY (product_id) references products(id) ON DELETE CASCADE)
+ENGINE = InnoDB;
+
+
+CREATE TABLE IF NOT EXISTS `dart`.`receipts` (
+   PRIMARY KEY (`id`),
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `observation` VARCHAR(255) NOT NULL,
+  `category_id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `paymentType` VARCHAR(255) NULL,
+  `totalPrice` NUMERIC NULL DEFAULT 0,
+  `dt_criacao` datetime DEFAULT CURRENT_TIMESTAMP,
+  `dt_autalizacao` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    foreign KEY (category_id) references categories(id) ON DELETE CASCADE,
+  foreign KEY (user_id) references users(id) ON DELETE CASCADE)
+ENGINE = InnoDB;
+
+ CREATE TABLE IF NOT EXISTS `dart`.`receipts_join_stories` (
+  receipt_id int NOT NULL,
+  story_id int NOT NULL,
+  foreign KEY (story_id) references stories(id) ON DELETE CASCADE,
+  foreign KEY (receipt_id) references receipts(id) ON DELETE CASCADE)
+ENGINE = InnoDB;
