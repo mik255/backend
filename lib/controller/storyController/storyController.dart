@@ -129,7 +129,7 @@ Future<StoreState> getLast() async {
           [
             story.name,
             story.pix,
-            story.paymentType,
+            story.paymentType??'',
             story.totalPrice,
             story.isBlocked
           ]);
